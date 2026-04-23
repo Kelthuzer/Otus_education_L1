@@ -13,7 +13,7 @@
   ```bash
   mkfs.ext4 /dev/vg_root/lv_root
   ```
-<img width="800" height="194" alt="image" src="https://github.com/user-attachments/assets/06e22568-2a0e-4dff-8ca7-9eea00df4a26" />
+  <img width="800" height="194" alt="image" src="https://github.com/user-attachments/assets/06e22568-2a0e-4dff-8ca7-9eea00df4a26" />
 - монтируем `mount /dev/vg_root/lv_root /mnt`
 - копируем `rsync -avxHAX --progress / /mnt/`, ждем завершения. В итоге получим
   ```
@@ -34,7 +34,7 @@
 - Перезагружаем систему `exit` `shutdown -r now`. Получаем ошибку `Running in chroot, ignoring request.` выходим из chroot и снова пробуем перезагруку получаем 
   <img width="800" height="126" alt="image" src="https://github.com/user-attachments/assets/da909d7f-8865-4b08-aa1a-c473864274a2" />
 - Проверяем наши действия `lsblk`
-<img width="800" height="175" alt="image" src="https://github.com/user-attachments/assets/8f74fb8e-6463-4c42-b65e-6129ee21362a" />
+  <img width="800" height="175" alt="image" src="https://github.com/user-attachments/assets/8f74fb8e-6463-4c42-b65e-6129ee21362a" />
 - т.к. изначально моя система была установлена не на LV создам для имитации раздел на sda2
   1) создаю VG на sda2 `vgcreate bubuntu_vg /dev/sda2`
   2) Создаю LV на весь размер `lvcreate -n bubuntu_vg/bubuntu_lv -l 100%FREE /dev/bubuntu_vg`
