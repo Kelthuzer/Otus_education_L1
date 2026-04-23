@@ -3,17 +3,19 @@
 - подготовка тома
   
   ```bash
-  pvcreate /dev/sdb /
-  vgcreate vg_root /dev/sdb /
-  lvcreate -n lv_root -l +100%FREE /dev/vg_r
+  pvcreate /dev/sdb 
+  vgcreate vg_root /dev/sdb
+  lvcreate -n lv_root -l +100%FREE /dev/vg_root
   ```
   получаем
-  <img width="800" height="134" alt="image" src="https://github.com/user-attachments/assets/5af7fad4-3d5e-4217-89ae-6f3fdfdd46d0" />
+  <img width="737" height="146" alt="image" src="https://github.com/user-attachments/assets/788170f8-3d8f-48d7-baf9-746f0dcf7cd1" />
 - создаем ФС
+  
   ```bash
   mkfs.ext4 /dev/vg_root/lv_root
   ```
-  <img width="800" height="194" alt="image" src="https://github.com/user-attachments/assets/06e22568-2a0e-4dff-8ca7-9eea00df4a26" />
+  <img width="599" height="188" alt="image" src="https://github.com/user-attachments/assets/b7ba26e5-2e33-458c-a081-1570801a573a" />
+
 - монтируем `mount /dev/vg_root/lv_root /mnt`
 - копируем `rsync -avxHAX --progress / /mnt/`, ждем завершения. В итоге получим
   ```
@@ -21,68 +23,59 @@
   total size is 4,118,307,974  speedup is 1.00
   ```
 - перепроверяем на всякий случай 
-  <img width="800" height="470" alt="image" src="https://github.com/user-attachments/assets/69c7334e-94e3-4c4f-bf48-b2a9ee6edc32" />
+  <img width="578" height="498" alt="image" src="https://github.com/user-attachments/assets/d424d558-1ec2-4262-91f9-9200ebba2eda" />
 - подготавливаем окружение 
   ```bash
   for i in /proc/ /sys/ /dev/ /run/ /boot/; do mount --bind $i /mnt/$i; done
   ```
 - меняем корень `chroot /mnt/`
 - настройка граб `grub-mkconfig -o /boot/grub/grub.cfg`
-  <img width="800" height="249" alt="image" src="https://github.com/user-attachments/assets/6a3a2db0-53c3-494f-aca1-7d8f885567ad" />
+  <img width="893" height="191" alt="image" src="https://github.com/user-attachments/assets/40d75076-3da8-43e7-92a1-7fc1dc1fc512" />
+
 - Обновим образ initrd `update-initramfs -u`
-`update-initramfs: Generating /boot/initrd.img-6.19.0-061900-generic`
-- Перезагружаем систему `exit` `shutdown -r now`. Получаем ошибку `Running in chroot, ignoring request.` выходим из chroot и снова пробуем перезагруку получаем 
-  <img width="800" height="126" alt="image" src="https://github.com/user-attachments/assets/da909d7f-8865-4b08-aa1a-c473864274a2" />
+  `update-initramfs: Generating /boot/initrd.img-6.8.0-110-generic`
+- Перезагружаем систему `exit` `shutdown -r now`. Получаем ошибку `Running in chroot, ignoring request.` выходим из chroot и снова пробуем перезагруку
 - Проверяем наши действия `lsblk`
-  <img width="800" height="175" alt="image" src="https://github.com/user-attachments/assets/8f74fb8e-6463-4c42-b65e-6129ee21362a" />
-- т.к. изначально моя система была установлена не на LV создам для имитации раздел на sda2
-  1) создаю VG на sda2 `vgcreate bubuntu_vg /dev/sda2`
-  2) Создаю LV на весь размер `lvcreate -n bubuntu_vg/bubuntu_lv -l 100%FREE /dev/bubuntu_vg`
-  результат 
-  <img width="800" height="183" alt="image" src="https://github.com/user-attachments/assets/147881e8-8e46-4767-91e5-3b3075744060" />
-  можно вернуться к методичке
-  <img width="800" height="208" alt="image" src="https://github.com/user-attachments/assets/003bbb61-4beb-4f49-8d74-c207a300c1de" />
+  <img width="742" height="53" alt="image" src="https://github.com/user-attachments/assets/cafb4535-f0f0-49b2-9cc1-8cd083717e6c" />
 - нужно уменьшить размер рут с 25 гб до 8 гб. Удаляем том
   ```bash
   lvremove /dev/bubuntu_vg/bubuntu_lv
   ```
   создаем новый с ключом `-L` чтоб указать конекртный размер
+  
   ```bash
-  lvcreate -n bubuntu_vg/bubuntu_lv -L 8G /dev/bubuntu_vg
+  lvcreate -n ubuntu-vg/ubuntu-lv -L 8G /dev/ubuntu-vg
   ```
   результат наших действий 
-  <img width="800" height="295" alt="image" src="https://github.com/user-attachments/assets/e5e46a2d-a3df-4788-8e2f-0388ca85e894" />
+  <img width="502" height="218" alt="image" src="https://github.com/user-attachments/assets/42f715f3-00c5-4180-b71e-b44ec81c6f93" />
+
 - теперь нужно вернуть всё что мы перенесли обратно повторяем действия с поправкой на расположение 
-  1) `mkfs.ext4 /dev/bubuntu_vg/bubuntu_lv`
-  2) `mount /dev/bubuntu_vg/bubuntu_lv /mnt`
+  1) `mkfs.ext4 /dev/ubuntu-vg/ubuntu-lv`
+  2) `mount /dev/ubuntu-vg/ubuntu-lv /mnt`
   3) `rsync -avxHAX --progress / /mnt/`
-  <img width="800" height="46" alt="image" src="https://github.com/user-attachments/assets/2d7475b2-9a8d-4991-aa70-9faa2b70533b" />
-  4) `for i in /proc/ /sys/ /dev/ /run/ /boot/; do mount --bind $i /mnt/root_resize/$i; done`
-  5) `chroot /mnt/`
-  6) `grub-mkconfig -o /boot/grub/grub.cfg`
-  7) `update-initramfs -u`
+  4) `for i in /proc/ /sys/ /dev/ /run/ /boot/; do mount --bind $i /mnt/$i; done` 
+  5) `chroot /mnt/` 
+  6) `grub-mkconfig -o /boot/grub/grub.cfg` 
+  7) `update-initramfs -u` 
   результат
-  <img width="800" height="304" alt="image" src="https://github.com/user-attachments/assets/57297f32-e00a-446a-9f11-b791755a8aac" />
+  <img width="888" height="259" alt="image" src="https://github.com/user-attachments/assets/81df8f2b-8e84-4432-9818-459b77655116" />
+
 - по спику заданий нужно сделать том для `/home` но в методичке предлогают сделать сразу том под `/var` в зеркало
 ## Выделить том под /var в зеркало
 - создаем зеркало
   ```bash
   pvcreate /dev/sdc /dev/sdd
   vgcreate vg_var /dev/sdc /dev/sdd
-  lvcreate -L 950M -m1 -n lv_var vg_var
+  lvcreate -L 1G -m1 -n lv_var vg_var
   ```
-  <img width="800" height="129" alt="image" src="https://github.com/user-attachments/assets/67dda166-761e-4144-91fa-e3f901db517b" />
+  <img width="712" height="141" alt="image" src="https://github.com/user-attachments/assets/6d90ee56-9127-470a-b330-83371c8b6b20" />
+
 - создаем фс, монтируем и преносим `/var`
   ```bash
   mkfs.ext4 /dev/vg_var/lv_var
   mount /dev/vg_var/lv_var /mnt
   cp -aR /var/* /mnt/
   ```
-  после `cp` получаем что места выделено мало 
-  <img width="800" height="212" alt="image" src="https://github.com/user-attachments/assets/5a9818c5-f4df-4b18-942b-bc61a8f5a787" />
-  увеличу LV отмотрировав перед этим `lvextend -L 100M /dev/vg_var/lv_var`
-  <img width="800" height="115" alt="image" src="https://github.com/user-attachments/assets/c2fce730-db51-48ad-a2de-63177d42205e" />
-  вывод без ошибок значит все сделано правильно
 - делаем копию `/var` 
   ```bash
   mkdir /tmp/oldvar && mv /var/* /tmp/oldvar
@@ -102,6 +95,17 @@
   exit
   shutdown -r now
   ```
+- результат стараний
+  <img width="514" height="335" alt="image" src="https://github.com/user-attachments/assets/9dae7b89-68d3-4b4b-8494-7489bef8b4fe" />
+- небольшая уборка
+  ```bash
+  lvremove /dev/vg_root/lv_root
+  vgremove /dev/vg_root
+  pvremove /dev/sdb
+  ```
+  результат
+  <img width="730" height="448" alt="image" src="https://github.com/user-attachments/assets/dcb15c46-065e-49a5-a5ea-dfb7ec5db2d5" />
+
 
 
 
