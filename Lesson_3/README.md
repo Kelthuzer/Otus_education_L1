@@ -122,7 +122,7 @@
   прописываем в fstab получаем
   <img width="709" height="385" alt="image" src="https://github.com/user-attachments/assets/2834ce96-5a0b-4d43-a371-52a5dabc68ae" />
 
-##Работа со снапшотами
+## Работа со снапшотами
 - создадим "наполненность" `/home`
   ```bash
   touch /home/file{1..50}
