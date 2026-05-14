@@ -22,7 +22,9 @@ EOF
     <img width="999" height="78" alt="image" src="https://github.com/user-attachments/assets/30079f76-2412-4c40-9bbd-6fee7e2d2b29" />
   - Проверяем `exportfs -s`
     Вывод `/srv/share  192.168.88.28/32(sync,wdelay,hide,no_subtree_check,sec=sys,rw,secure,root_squash,no_all_squash)`
+    
 ### Настраиваем клиент NFS
+
 - ставим клиент `apt install nfs-common`
 - Добавляем в `/etc/fstab` точку монтирования
   ```bash
