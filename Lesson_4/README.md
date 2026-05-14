@@ -6,7 +6,7 @@
   <img width="1096" height="242" alt="image" src="https://github.com/user-attachments/assets/a56c145d-6fc2-485a-9ac2-bec4db8937b9" />
 - Создаём пулы из двух дисков в режиме RAID 1 `zpool create %poolname% mirror %dev1% %dev2%`<br>
   <img width="603" height="66" alt="image" src="https://github.com/user-attachments/assets/2df35738-ff52-482b-8359-eb3a60a10b3f" />
-- смотрим список пулов `zpool list`
+- смотрим список пулов `zpool list`<br>
   <img width="692" height="96" alt="image" src="https://github.com/user-attachments/assets/0df46825-cfc0-411a-9afd-df6e77de5f9c" />
 - Добавим разные алгоритмы сжатия в каждую файловую систему
   1)  Алгоритм lzjb: `zfs set compression=lzjb zfs1`
@@ -117,6 +117,7 @@ otus  special_small_blocks  0                      default
   * `zfs get recordsize otus`
   * `zfs get compression otus`
   * `zfs get checksum otus`
+  * <br>
     <img width="448" height="258" alt="image" src="https://github.com/user-attachments/assets/9b13c794-5b93-455c-9547-71123d4c7cdf" />
 
   ## 3) Работа со снапшотом, поиск сообщения от преподавателя<br>
